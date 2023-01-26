@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from flask import Flask
 from flask_migrate import Migrate
 from model import db
+from utils import seed_data
 
 load_dotenv()
 database_uri = os.environ.get('DATABASE_URI')
@@ -16,3 +17,4 @@ db.init_app(app)
 
 with app.app_context():
     db.create_all()
+    seed_data(db)
