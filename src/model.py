@@ -3,41 +3,45 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 class Customer(db.Model):
-    __tablename__= "Customers"
-    Id = db.Column(db.Integer, primary_key=True)
-    GivenName = db.Column(db.String(50), unique=False, nullable=False)
-    Surname = db.Column(db.String(50), unique=False, nullable=False)
-    Streetaddress = db.Column(db.String(50), unique=False, nullable=False)
-    City = db.Column(db.String(50), unique=False, nullable=False)
-    Zipcode = db.Column(db.String(10), unique=False, nullable=False)
-    Country = db.Column(db.String(30), unique=False, nullable=False)
-    CountryCode = db.Column(db.String(2), unique=False, nullable=False)
-    Birthday = db.Column(db.DateTime, unique=False, nullable=False)
-    NationalId = db.Column(db.String(20), unique=False, nullable=False)
-    TelephoneCountryCode = db.Column(db.Integer, unique=False, nullable=False)
-    Telephone = db.Column(db.String(20), unique=False, nullable=False)
-    EmailAddress = db.Column(db.String(50), unique=False, nullable=False)
-
-    Accounts = db.relationship('Account', backref='Customer',
-     lazy=True)
+    __tablename__= 'Customers'
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(50), unique=False, nullable=False)
+    last_name = db.Column(db.String(50), unique=False, nullable=False)
+    street_address = db.Column(db.String(50), unique=False, nullable=False)
+    city = db.Column(db.String(50), unique=False, nullable=False)
+    zipcode = db.Column(db.String(10), unique=False, nullable=False)
+    country = db.Column(db.String(30), unique=False, nullable=False)
+    country_code = db.Column(db.String(2), unique=False, nullable=False)
+    birthday = db.Column(db.DateTime, unique=False, nullable=False)
+    national_id = db.Column(db.String(20), unique=False, nullable=False)
+    telephone_country_code = db.Column(db.Integer, unique=False, nullable=False)
+    telephone = db.Column(db.String(20), unique=False, nullable=False)
+    email_address = db.Column(db.String(50), unique=False, nullable=False)
+    accounts = db.relationship('Account', backref='Customer',lazy=True)
 
 class Account(db.Model):
-    __tablename__= "Accounts"
-    Id = db.Column(db.Integer, primary_key=True)
-    AccountType = db.Column(db.String(10), unique=False, nullable=False)
-    Created = db.Column(db.DateTime, unique=False, nullable=False)
-    Balance = db.Column(db.Integer, unique=False, nullable=False)
-    Transactions = db.relationship('Transaction', backref='Account',
+    __tablename__= 'Accounts'
+    id = db.Column(db.Integer, primary_key=True)
+    account_type = db.Column(db.String(10), unique=False, nullable=False)
+    created = db.Column(db.DateTime, unique=False, nullable=False)
+    balance = db.Column(db.Integer, unique=False, nullable=False)
+    transactions = db.relationship('Transaction', backref='Account',
      lazy=True)
-    CustomerId = db.Column(db.Integer, db.ForeignKey('Customers.Id'), nullable=False)
-
+    customer_id = db.Column(db.Integer, db.ForeignKey('Customers.id'), nullable=False)
 
 class Transaction(db.Model):
-    __tablename__= "Transactions"
-    Id = db.Column(db.Integer, primary_key=True)
-    Type = db.Column(db.String(20), unique=False, nullable=False)
-    Operation = db.Column(db.String(50), unique=False, nullable=False)
-    Date = db.Column(db.DateTime, unique=False, nullable=False)
-    Amount = db.Column(db.Integer, unique=False, nullable=False)
-    NewBalance = db.Column(db.Integer, unique=False, nullable=False)
-    AccountId = db.Column(db.Integer, db.ForeignKey('Accounts.Id'), nullable=False)
+    __tablename__= 'Transactions'
+    id = db.Column(db.Integer, primary_key=True)
+    type = db.Column(db.String(20), unique=False, nullable=False)
+    operation = db.Column(db.String(50), unique=False, nullable=False)
+    date = db.Column(db.DateTime, unique=False, nullable=False)
+    amount = db.Column(db.Integer, unique=False, nullable=False)
+    new_balance = db.Column(db.Integer, unique=False, nullable=False)
+    account_id = db.Column(db.Integer, db.ForeignKey('Accounts.id'), nullable=False)
+
+class User(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    email_address = db.Column(db.String(50), unique=False, nullable=False)
+    hashed_password = db.Column(db.String(128), nullable=False)
+    role = db.Column(db.String(50), nullable=False)
