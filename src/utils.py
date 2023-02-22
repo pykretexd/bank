@@ -30,14 +30,14 @@ def seed_data(db):
             else:
                 account.account_type = 'Savings'
             
-            random_date = datetime.now() + timedelta(days=-random.randint(1000, 10000))
+            random_date = datetime(1990, 5, 17) + timedelta(days=random.randint(1000, 10000))
             account.created = random_date
             account.balance = 0
 
             for n in range(random.randint(0, 30)):
                 balance = random.randint(0, 30) * 100
                 transaction = Transaction()
-                random_date = random_date + timedelta(days=-random.randint(10,100))
+                random_date = random_date + timedelta(days=random.randint(10,100))
                 if random_date > datetime.now():
                     break
                 transaction.date = random_date
@@ -72,7 +72,7 @@ def seed_data(db):
                         transaction.operation = "Transfer"
 
                 transaction.new_balance = account.balance
-            
+
             customer.accounts.append(account)
         
         db.session.add(customer)
