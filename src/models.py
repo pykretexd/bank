@@ -19,6 +19,23 @@ class Customer(db.Model):
     email_address = db.Column(db.String(50), unique=False, nullable=False)
     accounts = db.relationship('Account', backref='Customer',lazy=True)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'street_address': self.street_address,
+            'city': self.city,
+            'zipcode': self.zipcode,
+            'country': self.country,
+            'country_code': self.country_code,
+            'birthday': self.birthday,
+            'national_id': self.national_id,
+            'telephone_country_code': self.telephone_country_code,
+            'telephone': self.telephone,
+            'email_address': self.email_address,
+        }
+
 class Account(db.Model):
     __tablename__= 'Accounts'
     id = db.Column(db.Integer, primary_key=True)
