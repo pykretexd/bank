@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 import random
-from model import Customer, Account, Transaction
+from models import Customer, Account, Transaction
 import barnum
 
 def seed_data(db):
