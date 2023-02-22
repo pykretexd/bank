@@ -1,1 +1,44 @@
-{% extends 'base.html' %} {% block content %} {% endblock %}
+{% extends 'base.html' %}
+{% block content %}
+<p>Customers registered: {{ customer_count }}</p>
+<table class='table table-striped table-bordered table-hover table-sm'>
+    <thead>
+        <tr>
+            <th scope='col'>#</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Street Address</th>
+            <th>City</th>
+            <th>Zipcode</th>
+            <th>Country</th>
+            <th>Birthday</th>
+            <th>National ID</th>
+            <th>Telephone</th>
+            <th>Email Address</th>
+            <th>Profile Link</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for customer in customers %}
+            <tr>
+                <th scope='row'>{{ customer.id }}</th>
+                <td>{{ customer.first_name }}</td>
+                <td>{{ customer.last_name }}</td>
+                <td>{{ customer.street_address }}</td>
+                <td>{{ customer.city }}</td>
+                <td>{{ customer.zipcode }}</td>
+                <td>{{ customer.country }}</td>
+                <td>{{ customer.birthday }}</td>
+                <td>{{ customer.national_id }}</td>
+                <td>{{ customer.telephone }}</td>
+                <td>{{ customer.email_address }}</td>
+                <td><a href='{{ url_for("profile", id=customer.id) }}'>View Profile</a></td>  
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<div class='d-flex gap-4'>
+    {% if customers.has_prev %} <a href='{{ url_for("index", page=customers.prev_num) }}'>prev</a> {% endif %}
+    {% if customers.has_next %} <a href='{{ url_for("index", page=customers.next_num) }}'>next</a> {% endif %}
+</div>
+{% endblock %}
