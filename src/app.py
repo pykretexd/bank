@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from flask import Flask
 from flask_migrate import Migrate
-from model import db
+from models import db
 from utils import seed_data
 
 load_dotenv()
