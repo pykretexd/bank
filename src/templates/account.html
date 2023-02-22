@@ -1,1 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<table id='data' class='table table-bordered sortable-table'> 
+    <thead>
+        <tr>
+            <th scope='col' class='user-select-none'>#</th>
+            <th scope='col' class='user-select-none'>Amount</th>
+            <th scope='col' class='user-select-none'>New Balance</th>
+            <th scope='col' class='user-select-none'>Date and Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for transaction in transactions %}
+        <tr>
+            <td>{{ transaction.id }}</td>
+            {% if transaction.type == 'Debit' %}
+                <td class='text-success'>+{{ transaction.amount }}</td>
+            {% else %}
+                <td class='text-danger'>-{{ transaction.amount }}</td>
+            {% endif %}
             <td>{{ transaction.new_balance }}</td>
+            <td>{{ transaction.date }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
