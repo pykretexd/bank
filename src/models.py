@@ -12,7 +12,7 @@ class Customer(db.Model):
     zipcode = db.Column(db.String(10), unique=False, nullable=False)
     country = db.Column(db.String(30), unique=False, nullable=False)
     country_code = db.Column(db.String(2), unique=False, nullable=False)
-    birthday = db.Column(db.DateTime, unique=False, nullable=False)
+    birthday = db.Column(db.Date, unique=False, nullable=False)
     national_id = db.Column(db.String(20), unique=False, nullable=False)
     telephone_country_code = db.Column(db.Integer, unique=False, nullable=False)
     telephone = db.Column(db.String(20), unique=False, nullable=False)
