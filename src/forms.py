@@ -10,5 +10,6 @@ class CreateCustomerForm(FlaskForm):
     street_address = StringField('Street Address', validators=[DataRequired()])
     city = StringField('City', validators=[DataRequired()])
     country = StringField('Country', validators=[DataRequired()])
+    zipcode = IntegerField('ZIP code', validators=[DataRequired()])
     birthday = DateField('Date of Birth', validators=[DataRequired()])
     national_id = IntegerField('National ID', validators=[DataRequired()])
