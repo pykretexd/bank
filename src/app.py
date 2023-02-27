@@ -18,8 +18,12 @@ db.init_app(app)
 
 @app.route('/')
 def index():
+    return render_template('index.html')
+
+@app.route('/customer/create')
+def create_customer():
     form = CreateCustomerForm()
-    return render_template('index.html', form=form)
+    return render_template('create_customer.html', form=form)
 
 @app.route('/customer/<int:customer_id>')
 def customer(customer_id):
