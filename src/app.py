@@ -1,10 +1,11 @@
 import os
 from dotenv import load_dotenv
-from flask import Flask, render_template, url_for, request
+from flask import Flask, render_template, redirect, url_for, request, flash, get_flashed_messages
 from flask_migrate import Migrate
 from models import db, Account, Customer, Transaction, User
 from utils import seed_data
 from forms import CreateCustomerForm
+import datetime
 
 load_dotenv()
 database_uri = os.environ.get('DATABASE_URI')
@@ -18,8 +19,37 @@ db.init_app(app)
 
 @app.route('/')
 def index():
+    return render_template('index.html')
+
+@app.route('/customer/create', methods=['GET', 'POST'])
+def create_customer():
     form = CreateCustomerForm()
-    return render_template('index.html', form=form)
+    if form.validate_on_submit():
+        try:
+            customer = Customer(
+                first_name=form.first_name.data,
+                last_name=form.last_name.data,
+                street_address=form.street_address.data,
+                city=form.city.data,
+                zipcode=form.zipcode.data,
+                country=form.country.data,
+                country_code=form.country_code.data,
+                birthday=form.birthday.data,
+                national_id=form.national_id.data,
+                telephone_country_code=form.telephone_country_code.data,
+                telephone=form.phone_number.data,
+                email_address=form.email_address.data,
+            )
+            account = Account(account_type='Personal', created=datetime.datetime.now(), balance=0)
+            customer.accounts.append(account)
+            db.session.add(customer)
+            db.session.add(account)
+            db.session.commit()
+            flash('Customer successfully created.')
+            return redirect(url_for('index'))
+        except:
+            flash(f'Something went wrong.')
+    return render_template('create_customer.html', form=form)
 
 @app.route('/customer/<int:customer_id>')
 def customer(customer_id):
