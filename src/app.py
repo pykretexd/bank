@@ -4,6 +4,7 @@ from flask import Flask, render_template, url_for, request
 from flask_migrate import Migrate
 from models import db, Account, Customer, Transaction, User
 from utils import seed_data
+from forms import CreateCustomerForm
 
 load_dotenv()
 database_uri = os.environ.get('DATABASE_URI')
@@ -17,7 +18,8 @@ db.init_app(app)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    form = CreateCustomerForm()
+    return render_template('index.html', form=form)
 
 @app.route('/customer/<int:customer_id>')
 def customer(customer_id):
@@ -42,8 +44,10 @@ def customer_data():
             Customer.first_name.like(f'%{search}%'),
             Customer.last_name.like(f'%{search}%'),
             Customer.email_address.like(f'%{search}%'),
+            Customer.street_address.like(f'%{search}%'),
             Customer.country.like(f'%{search}%'),
-            Customer.city.like(f'%{search}%')
+            Customer.city.like(f'%{search}%'),
+            Customer.zipcode.like(f'%{search}%')
         ))
     total_filtered = query.count()
 
