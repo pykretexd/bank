@@ -42,6 +42,18 @@
                 {% endfor %}
             </tbody>
         </table>
+        <p class='card-text'>Total balance: {{ balance }}</p>
+    </div>
+</div>
+
+<h3>Make a Transaction</h3>
+<div class='card'>
+    <div class='card-body'>
+        <ul class='list-group list-group-flush'>
+            <li class='list-group-item'><a href='{{ url_for("withdraw", customer_id=customer.id) }}'>Withdraw</a></li>
+            <li class='list-group-item'><a href='{{ url_for("deposit", customer_id=customer.id) }}'>Deposit</a></li>
+            <li class='list-group-item'><a href='{{ url_for("transfer", customer_id=customer.id) }}'>Transfer</a></li>
+        </ul>
     </div>
 </div>
 {% endblock %}

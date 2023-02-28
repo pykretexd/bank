@@ -20,6 +20,10 @@ class Customer(db.Model):
     accounts = db.relationship('Account', backref='Customer',lazy=True)
 
     def to_dict(self):
+        accounts = self.accounts
+        balance = 0
+        for account in accounts:
+            balance += account.balance
         return {
             'id': self.id,
             'first_name': self.first_name,
@@ -34,6 +38,7 @@ class Customer(db.Model):
             'telephone_country_code': self.telephone_country_code,
             'telephone': self.telephone,
             'email_address': self.email_address,
+            'balance': balance
         }
 
 class Account(db.Model):

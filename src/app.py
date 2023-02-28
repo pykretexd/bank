@@ -55,7 +55,23 @@ def create_customer():
 def customer(customer_id):
     customer = Customer.query.get_or_404(customer_id)
     accounts = Account.query.filter_by(customer_id=customer_id).all()
-    return render_template('customer.html', customer=customer, accounts=accounts)
+    balance = 0
+    for account in accounts:
+        balance += account.balance
+
+    return render_template('customer.html', customer=customer, accounts=accounts, balance=balance)
+
+@app.route('/customer/<int:customer_id>/withdraw')
+def withdraw(customer_id):
+    return render_template('withdraw.html')
+
+@app.route('/customer/<int:customer_id>/deposit')
+def deposit(customer_id):
+    return render_template('deposit.html')
+
+@app.route('/customer/<int:customer_id>/transfer')
+def transfer(customer_id):
+    return render_template('transfer.html')
 
 @app.route('/customer/<int:customer_id>/account/<int:account_id>')
 def account(customer_id, account_id):
