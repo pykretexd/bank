@@ -1,4 +1,4 @@
-# bank
+# Bank
 
 Se till att skapa en .env fil i `src` med samma fält som i `.env.example`.
 
