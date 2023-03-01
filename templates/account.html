@@ -4,24 +4,32 @@
     <thead>
         <tr>
             <th scope='col' class='user-select-none'>#</th>
+            <th scope='col' class='user-select-none'>Type</th>
+            <th scope='col' class='user-select-none'>Operation</th>
             <th scope='col' class='user-select-none'>Amount</th>
             <th scope='col' class='user-select-none'>New Balance</th>
-            <th scope='col' class='user-select-none'>Date and Time</th>
+            <th scope='col' class='user-select-none'>Timestamp</th>
         </tr>
     </thead>
-    <tbody>
-        {% for transaction in transactions %}
-        <tr>
-            <td>{{ transaction.id }}</td>
-            {% if transaction.type == 'Debit' %}
-                <td class='text-success'>+{{ transaction.amount }}</td>
-            {% else %}
-                <td class='text-danger'>-{{ transaction.amount }}</td>
-            {% endif %}
-            <td>{{ transaction.new_balance }}</td>
-            <td>{{ transaction.date }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
+    <tbody></tbody>
 </table>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(document).ready(function () {
+            $('#data').DataTable({
+                ajax: '/api/accounts/{{ account.id }}',
+                serverSide: true,
+                columns: [
+                    {data: 'id'},
+                    {data: 'type', orderable: false},
+                    {data: 'operation', orderable: false},
+                    {data: 'amount', orderable: false},
+                    {data: 'new_balance', orderable: false},
+                    {data: 'datetime'},
+                ],
+            });
+        });
+    </script>
 {% endblock %}
