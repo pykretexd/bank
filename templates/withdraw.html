@@ -1,5 +1,13 @@
 {% extends 'base.html' %}
 {% block content %}
 <h2>Withdraw</h2>
-
+<form method='POST'>
+    {{ form.csrf_token }}
+    {{ form.account.label(class='form-label') }}
+    {{ form.account(class='form-control') }}
+    {{ form.amount.label(class='form-label') }}
+    {{ form.amount(class='form-control') }}
+    <br>
+    {{ form.submit(class='btn btn-secondary') }}
+</form>
 {% endblock %}
