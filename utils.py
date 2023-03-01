@@ -3,6 +3,11 @@ import random
 from models import Customer, Account, Transaction
 import barnum
 
+def check_valid_withdraw(balance, amount):
+    new_balance = balance - amount
+    if amount > balance or new_balance < 0 or amount <= 0:
+        raise Exception('Invalid amount.')
+
 def seed_data(db):
     customer_count = Customer.query.count()
     while customer_count < 5000:
