@@ -61,6 +61,16 @@ class Transaction(db.Model):
     new_balance = db.Column(db.Integer, unique=False, nullable=False)
     account_id = db.Column(db.Integer, db.ForeignKey('Accounts.id'), nullable=False)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'type': self.type,
+            'operation': self.operation,
+            'amount': self.amount,
+            'new_balance': self.new_balance,
+            'datetime': self.date
+        }
+
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)

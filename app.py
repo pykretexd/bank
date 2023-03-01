@@ -140,14 +140,13 @@ def transfer(customer_id):
 
     return render_template('transfer.html', form=form)
 
-@app.route('/customer/<int:customer_id>/account/<int:account_id>')
+@app.route('/customer/<int:customer_id>/account/<int:account_id>', methods=['GET'])
 def account(customer_id, account_id):
     account = Account.query.get_or_404(account_id)
-    transactions = Transaction.query.filter_by(account_id=account_id).all()
-    return render_template('account.html', account=account, transactions=transactions)
+    return render_template('account.html', account=account)
 
-@app.route('/api/customer_data')
-def customer_data():
+@app.route('/api/customers')
+def customers():
     query = Customer.query
 
     search = request.args.get('search[value]')
@@ -194,6 +193,49 @@ def customer_data():
         'recordsTotal': Customer.query.count(),
         'draw': request.args.get('draw', type=int),
     }
+
+@app.route('/api/accounts/<int:account_id>')
+def account_data(account_id):
+    query = Transaction.query.filter_by(account_id=account_id)
+    
+    search = request.args.get('search[value]')
+    if search:
+        query = query.filter(db.or_(
+            Transaction.id.like(f'%{search}%'),
+        ))
+    total_filtered = query.count()
+
+    order = []
+    i = 0
+    while True:
+        column_index = request.args.get(f'order[{i}][column]')
+        if column_index is None:
+            break
+
+        column_name = request.args.get(f'columns[{column_index}][data]')
+        if column_name not in ['id']:
+            column_name = 'id'
+
+        descending = request.args.get(f'order[{i}][dir]') == 'desc'
+        column = getattr(Transaction, column_name)
+        if descending:
+            column = column.desc()
+        order.append(column)
+        i += 1
+    if order:
+        query = query.order_by(*order)
+
+    pagination_start = request.args.get('start', type=int)
+    pagination_length = request.args.get('length', type=int)
+    query = query.offset(pagination_start).limit(pagination_length)
+
+    return {
+        'data': [transaction.to_dict() for transaction in query],
+        'recordsFiltered': total_filtered,
+        'recordsTotal': Transaction.query.filter_by(account_id=account_id).count(),
+        'draw': request.args.get('draw', type=int),
+    }
+
 
 if __name__ == '__main__':
     with app.app_context():
