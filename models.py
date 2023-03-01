@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
 
@@ -47,8 +48,7 @@ class Account(db.Model):
     account_type = db.Column(db.String(10), unique=False, nullable=False)
     created = db.Column(db.DateTime, unique=False, nullable=False)
     balance = db.Column(db.Integer, unique=False, nullable=False)
-    transactions = db.relationship('Transaction', backref='Account',
-     lazy=True)
+    transactions = db.relationship('Transaction', backref='Account', lazy=True)
     customer_id = db.Column(db.Integer, db.ForeignKey('Customers.id'), nullable=False)
 
 class Transaction(db.Model):
@@ -71,9 +71,27 @@ class Transaction(db.Model):
             'datetime': self.date
         }
 
+class Role(db.Model):
+    __tablename__ = 'Roles'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+    users = db.relationship('User', backref='Role', lazy=True)
+
 class User(db.Model):
-    __tablename__ = 'users'
+    __tablename__ = 'Users'
     id = db.Column(db.Integer, primary_key=True)
     email_address = db.Column(db.String(50), unique=False, nullable=False)
     hashed_password = db.Column(db.String(128), nullable=False)
-    role = db.Column(db.String(50), nullable=False)
+    role = db.Column(db.Integer, db.ForeignKey('Roles.id'), nullable=False)
+
+    @property
+    def password(self):
+        raise AttributeError('Password is not readable.')
+    
+    @password.setter
+    def password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def verify_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
