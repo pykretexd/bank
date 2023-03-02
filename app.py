@@ -4,9 +4,9 @@ from flask import Flask, render_template, redirect, url_for, request, flash, get
 from flask_migrate import Migrate
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, Account, Customer, Transaction, User
+from models import db, Account, Customer, Transaction, User, Role
 from utils import check_valid_withdraw, seed_data
-from forms import CreateCustomerForm, WithdrawForm, DepositForm, TransferForm, LoginUserForm, SignupUserForm, UpdateUserForm
+from forms import CreateCustomerForm, WithdrawForm, DepositForm, TransferForm, LoginUserForm, SignupUserForm, UpdateCustomerForm, UpdateUserForm
 import datetime
 
 load_dotenv()
@@ -198,10 +198,46 @@ def logout():
     flash('Logged out.')
     return redirect(url_for('index'))
 
+@app.route('/manage_users')
+@login_required
+def manage_users():
+    current_user_role = Role.query.get_or_404(current_user.role)
+    if current_user_role.name != 'Admin':
+        flash('Invalid user role.')
+        return redirect(url_for('index'))
+    else:
+        return render_template('manage_users.html')
+
+@app.route('/manage_users/<int:user_id>', methods=['GET', 'POST'])
+@login_required
+def update_user(user_id):
+    current_user_role = Role.query.get_or_404(current_user.role)
+    if current_user_role.name != 'Admin':
+        flash('Invalid user role.')
+        return redirect(url_for('index'))
+
+    form = UpdateUserForm()
+    form.role.choices = [(role.id, role.name) for role in Role.query.all()]
+    user_to_update = User.query.get_or_404(user_id)
+    user_role = Role.query.filter_by(id=user_to_update.role).first()
+
+    if form.validate_on_submit():
+        user_to_update.email_address = form.email_address.data
+        user_to_update.role = form.role.data
+        
+        try:
+            db.session.commit()
+            flash('User successfully updated.')
+            return redirect(url_for('manage_users'))
+        except:
+            flash('Something unexpected happened, please try again.')
+
+    return render_template('update_user.html', form=form, user_to_update=user_to_update, user_role=user_role)
+
 @app.route('/update_customer/<int:customer_id>', methods=['GET', 'POST'])
 @login_required
 def update_customer(customer_id):
-    form = UpdateUserForm()
+    form = UpdateCustomerForm()
     customer_to_update = Customer.query.get_or_404(customer_id)
 
     if form.validate_on_submit():
@@ -297,6 +333,49 @@ def customers():
         'data': [customer.to_dict() for customer in query],
         'recordsFiltered': total_filtered,
         'recordsTotal': Customer.query.count(),
+        'draw': request.args.get('draw', type=int),
+    }
+
+@app.route('/api/users')
+def users():
+    query = User.query
+
+    search = request.args.get('search[value]')
+    if search:
+        query = query.filter(db.or_(
+            User.id.like(f'%{search}%'),
+            User.email_address.like(f'%{search}%'),
+        ))
+    total_filtered = query.count()
+
+    order = []
+    i = 0
+    while True:
+        column_index = request.args.get(f'order[{i}][column]')
+        if column_index is None:
+            break
+
+        column_name = request.args.get(f'columns[{column_index}][data]')
+        if column_name not in ['id', 'email_address']:
+            column_name = 'id'
+
+        descending = request.args.get(f'order[{i}][dir]') == 'desc'
+        column = getattr(User, column_name)
+        if descending:
+            column = column.desc()
+        order.append(column)
+        i += 1
+    if order:
+        query = query.order_by(*order)
+
+    pagination_start = request.args.get('start', type=int)
+    pagination_length = request.args.get('length', type=int)
+    query = query.offset(pagination_start).limit(pagination_length)
+
+    return {
+        'data': [user.to_dict() for user in query],
+        'recordsFiltered': total_filtered,
+        'recordsTotal': User.query.count(),
         'draw': request.args.get('draw', type=int),
     }
 
