@@ -16,10 +16,10 @@ def seed_data(db):
 
 def seed_roles(db):
     if Role.query.filter_by(name='Cashier').first() is None:
-        cashier = Role(name='Cashier')
+        cashier = Role(id=1, name='Cashier')
         db.session.add(cashier)
     if Role.query.filter_by(name='Admin').first() is None:
-        admin = Role(name='Admin')
+        admin = Role(id=2, name='Admin')
         db.session.add(admin)
     db.session.commit()
 

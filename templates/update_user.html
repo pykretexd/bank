@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<form method='POST'>
+    {{ form.hidden_tag() }}
+
+    {{ form.email_address.label(class='form-label') }}
+    {{ form.email_address(class='form-control', value=user_to_update.email_address) }}
+    <br>
+    {{ form.role.label(class='form-label') }}
+    {{ form.role(class='form-control', value=user_role.name) }}
+    <br>
+    {{ form.submit(class='btn btn-secondary') }}
+</form>
+{% endblock %}

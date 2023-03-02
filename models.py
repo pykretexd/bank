@@ -85,6 +85,14 @@ class User(db.Model, UserMixin):
     hashed_password = db.Column(db.String(128), nullable=False)
     role = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)
 
+    def to_dict(self):
+        role = Role.query.get(self.role)
+        return {
+            'id': self.id,
+            'email_address': self.email_address,
+            'role': role.name
+        }
+
     @property
     def password(self):
         raise AttributeError('Password is not readable.')
