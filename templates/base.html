@@ -22,6 +22,9 @@
                         <a class='nav-link' href="{{ url_for('create_customer') }}">Create Customer</a>
                         {% if current_user.is_authenticated %}
                             <p class='nav-link m-0'>{{ current_user.email_address }}</p>
+                            {% if current_user.role == 2 %}
+                                <a class='nav-link' href='{{ url_for("manage_users") }}'>Manage users</a>
+                            {% endif %}
                             <a class='nav-link' href='{{ url_for("logout") }}'>Sign Out</a>
                         {% else %}
                             <a class='nav-link' href='{{ url_for("login") }}'>Log in</a>
