@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, DateField, IntegerField, SelectField
-from wtforms.validators import DataRequired, Email
+from wtforms import StringField, SubmitField, DateField, IntegerField, SelectField, PasswordField
+from wtforms.validators import DataRequired, Email, EqualTo
 
 def CountryCode(form, field):
     if len(field.data) != 2:
@@ -36,3 +36,13 @@ class TransferForm(FlaskForm):
     target = IntegerField('Enter ID of account to transfer to.', validators=[DataRequired()])
     amount = IntegerField('How much would you like to transfer?', validators=[DataRequired()])
     submit = SubmitField('Confirm')
+
+class LoginUserForm(FlaskForm):
+    email_address = StringField('Email Address', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
+class SignupUserForm(FlaskForm):
+    email_address = StringField('Email Address', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message='Passwords must match')])
