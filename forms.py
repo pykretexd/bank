@@ -6,6 +6,10 @@ def CountryCode(form, field):
     if len(field.data) != 2:
         raise ValidationError('Country code must be 2 characters.')
 
+def NationalId(form, field):
+    if len(field.data) < 12:
+        raise ValidationError('National ID must be 12 characters.')
+
 class CreateCustomerForm(FlaskForm):
     first_name = StringField('First Name', validators=[DataRequired()])
     last_name = StringField('Last Name', validators=[DataRequired()])
@@ -46,3 +50,18 @@ class SignupUserForm(FlaskForm):
     email_address = StringField('Email Address', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message='Passwords must match')])
+
+class UpdateUserForm(FlaskForm):
+    first_name = StringField('First Name')
+    last_name = StringField('Last Name')
+    email_address = StringField('Email Address', validators=[Email()])
+    telephone_country_code = IntegerField('Telephone Country Code')
+    phone_number = StringField('Phone Number')
+    street_address = StringField('Street Address')
+    city = StringField('City')
+    country = StringField('Country')
+    country_code = StringField('Country Code', validators=[CountryCode()])
+    zipcode = IntegerField('ZIP code')
+    birthday = DateField('Date of Birth')
+    national_id = StringField('National ID (XXXXXXXX-XXXX)', validators=[NationalId()])
+    submit = SubmitField('Submit')
