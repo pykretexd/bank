@@ -2,9 +2,11 @@ import os
 from dotenv import load_dotenv
 from flask import Flask, render_template, redirect, url_for, request, flash, get_flashed_messages
 from flask_migrate import Migrate
+from flask_login import login_user, LoginManager, login_required, logout_user, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, Account, Customer, Transaction, User
 from utils import check_valid_withdraw, seed_data
-from forms import CreateCustomerForm, WithdrawForm, DepositForm, TransferForm
+from forms import CreateCustomerForm, WithdrawForm, DepositForm, TransferForm, LoginUserForm, SignupUserForm, UpdateUserForm
 import datetime
 
 load_dotenv()
@@ -16,6 +18,14 @@ migrate = Migrate(app, db)
 app.config['SQLALCHEMY_DATABASE_URI'] = str(database_uri)
 app.config['SECRET_KEY'] = str(secret_key)
 db.init_app(app)
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 @app.route('/')
 def index():
@@ -144,6 +154,102 @@ def transfer(customer_id):
 def account(customer_id, account_id):
     account = Account.query.get_or_404(account_id)
     return render_template('account.html', account=account)
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    form = SignupUserForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email_address=form.email_address.data).first()
+        if user is None:
+            password_hash = generate_password_hash(form.password.data, 'sha256')
+            new_user = User(email_address=form.email_address.data, hashed_password=password_hash)
+            cashier_role = Role.query.filter_by(name='Cashier').first()
+            cashier_role.users.append(new_user)
+
+            db.session.add(new_user)
+            db.session.commit()
+
+            flash('Sign up successful!')
+            return redirect(url_for('login'))
+        else:
+            flash('Email address has already been signed up.')
+    return render_template('signup.html', form=form)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginUserForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email_address=form.email_address.data).first()
+        if user:
+            if check_password_hash(user.hashed_password, form.password.data):
+                login_user(user)
+                flash('Log in successful!')
+                return redirect(url_for('index'))
+            else:
+                flash('Credentials did not match, please try again.')
+        else:
+            flash('User does not exist.')
+    return render_template('login.html', form=form)
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Logged out.')
+    return redirect(url_for('index'))
+
+@app.route('/update_customer/<int:customer_id>', methods=['GET', 'POST'])
+@login_required
+def update_customer(customer_id):
+    form = UpdateUserForm()
+    customer_to_update = Customer.query.get_or_404(customer_id)
+
+    if form.validate_on_submit():
+        customer_to_update.first_name = form.first_name.data
+        customer_to_update.last_name = form.last_name.data
+        customer_to_update.street_address = form.street_address.data
+        customer_to_update.city = form.city.data
+        customer_to_update.zipcode = form.zipcode.data
+        customer_to_update.country = form.country.data
+        customer_to_update.country_code = form.country_code.data
+        customer_to_update.birthday = form.birthday.data
+        customer_to_update.national_id = form.national_id.data
+        customer_to_update.telephone_country_code = form.telephone_country_code.data
+        customer_to_update.telephone = form.phone_number.data
+        customer_to_update.email_address = form.email_address.data
+
+        try:
+            db.session.commit()
+            flash('Customer successfully updated.')
+            return render_template('update_customer.html', form=form, customer_to_update=customer_to_update)
+        except:
+            flash('Something unexpected happened, please try again.')
+            return render_template('update_customer.html', form=form, customer_to_update=customer_to_update)
+    
+    return render_template('update_customer.html', form=form, customer_to_update=customer_to_update)
+
+@app.route('/delete_customer/<int:customer_id>')
+@login_required
+def delete_customer(customer_id):
+    if current_user.is_authenticated:
+        try:
+            customer_to_delete = Customer.query.get_or_404(customer_id)
+            accounts = Account.query.filter_by(customer_id=customer_to_delete.id).all()
+            for account in accounts:
+                transactions = Transaction.query.filter_by(account_id=account.id).all()
+                for transaction in transactions:
+                    db.session.delete(transaction)
+                db.session.delete(account)
+            db.session.delete(customer_to_delete)
+            db.session.commit()
+            flash(f'Customer #{customer_id} has successfully been deleted.')
+            return redirect(url_for('index'))
+        except Exception as e:
+            flash(f'Something unexpected happened, please try again. {str(e)}')
+            return redirect(url_for('customer', customer_id=customer_id))
+    else:
+        flash('You cannot perform this action.')
+        return redirect(url_for('index'))
 
 @app.route('/api/customers')
 def customers():

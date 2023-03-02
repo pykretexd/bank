@@ -1,9 +1,11 @@
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
 
 class Customer(db.Model):
-    __tablename__= 'Customers'
+    __tablename__= 'customers'
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(50), unique=False, nullable=False)
     last_name = db.Column(db.String(50), unique=False, nullable=False)
@@ -42,24 +44,23 @@ class Customer(db.Model):
         }
 
 class Account(db.Model):
-    __tablename__= 'Accounts'
+    __tablename__= 'accounts'
     id = db.Column(db.Integer, primary_key=True)
     account_type = db.Column(db.String(10), unique=False, nullable=False)
     created = db.Column(db.DateTime, unique=False, nullable=False)
     balance = db.Column(db.Integer, unique=False, nullable=False)
-    transactions = db.relationship('Transaction', backref='Account',
-     lazy=True)
-    customer_id = db.Column(db.Integer, db.ForeignKey('Customers.id'), nullable=False)
+    transactions = db.relationship('Transaction', backref='Account', lazy=True)
+    customer_id = db.Column(db.Integer, db.ForeignKey('customers.id'), nullable=False)
 
 class Transaction(db.Model):
-    __tablename__= 'Transactions'
+    __tablename__= 'transactions'
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(20), unique=False, nullable=False)
     operation = db.Column(db.String(50), unique=False, nullable=False)
     date = db.Column(db.DateTime, unique=False, nullable=False)
     amount = db.Column(db.Integer, unique=False, nullable=False)
     new_balance = db.Column(db.Integer, unique=False, nullable=False)
-    account_id = db.Column(db.Integer, db.ForeignKey('Accounts.id'), nullable=False)
+    account_id = db.Column(db.Integer, db.ForeignKey('accounts.id'), nullable=False)
 
     def to_dict(self):
         return {
@@ -71,9 +72,27 @@ class Transaction(db.Model):
             'datetime': self.date
         }
 
-class User(db.Model):
+class Role(db.Model):
+    __tablename__ = 'roles'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+    users = db.relationship('User', backref='Role', lazy=True)
+
+class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    email_address = db.Column(db.String(50), unique=False, nullable=False)
+    email_address = db.Column(db.String(128), unique=True, nullable=False)
     hashed_password = db.Column(db.String(128), nullable=False)
-    role = db.Column(db.String(50), nullable=False)
+    role = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)
+
+    @property
+    def password(self):
+        raise AttributeError('Password is not readable.')
+    
+    @password.setter
+    def password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def verify_password(self, password):
+        return check_password_hash(self.password_hash, password)
+

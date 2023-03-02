@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta
 import random
-from models import Customer, Account, Transaction
+from models import Customer, Account, Transaction, Role, User
 import barnum
+from werkzeug.security import generate_password_hash
 
 def check_valid_withdraw(balance, amount):
     new_balance = balance - amount
@@ -9,8 +10,40 @@ def check_valid_withdraw(balance, amount):
         raise Exception('Invalid amount.')
 
 def seed_data(db):
+    seed_roles(db)
+    seed_users(db)
+    seed_customers(5000, db)
+
+def seed_roles(db):
+    if Role.query.filter_by(name='Cashier').first() is None:
+        cashier = Role(name='Cashier')
+        db.session.add(cashier)
+    if Role.query.filter_by(name='Admin').first() is None:
+        admin = Role(name='Admin')
+        db.session.add(admin)
+    db.session.commit()
+
+def seed_users(db):
+    if User.query.filter_by(email_address='stefan.holmberg@systementor.se').first() is None:
+        admin_role = Role.query.filter_by(name='Admin').first()
+        password_hash = generate_password_hash('Hejsan123#', 'sha256')
+        new_admin = User(email_address='stefan.holmberg@systementor.se', hashed_password=password_hash)
+        admin_role.users.append(new_admin)
+        db.session.add(new_admin)
+
+    if User.query.filter_by(email_address='stefan.holmberg@nackademin.se').first() is None:
+        cashier_role = Role.query.filter_by(name='Cashier').first()
+        password_hash = generate_password_hash('Hejsan123#', 'sha256')
+        new_cashier = User(email_address='stefan.holmberg@nackademin.se', hashed_password=password_hash)
+        cashier_role.users.append(new_cashier)
+        db.session.add(new_cashier)
+
+    db.session.commit()
+
+
+def seed_customers(amount, db):
     customer_count = Customer.query.count()
-    while customer_count < 5000:
+    while customer_count < amount:
         customer = Customer()
         customer.first_name, customer.last_name = barnum.create_name()
         customer.street_address = barnum.create_street()
@@ -83,3 +116,4 @@ def seed_data(db):
         db.session.add(customer)
         db.session.commit()
         customer_count += 1
+
