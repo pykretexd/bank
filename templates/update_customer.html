@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block content %}
+<form method='POST' class='border p-3 my-3 bg-body rounded'>
+    <div>
+        {{ form.hidden_tag() }}
+        {{ form.first_name.label(class='form-label') }}
+        {{ form.first_name(class='form-control') }}
+        {{ form.last_name.label(class='form-label') }}
+        {{ form.last_name(class='form-control') }}
+        {{ form.email_address.label(class='form-label') }}
+        {{ form.email_address(class='form-control') }}
+        {{ form.telephone_country_code.label(class='form-label') }}
+        {{ form.telephone_country_code(class='form-control') }}
+        {{ form.phone_number.label(class='form-label') }}
+        {{ form.phone_number(class='form-control') }}
+        {{ form.street_address.label(class='form-label') }}
+        {{ form.street_address(class='form-control') }}
+        {{ form.city.label(class='form-label') }}
+        {{ form.city(class='form-control') }}
+        {{ form.country.label(class='form-label') }}
+        {{ form.country(class='form-control') }}
+        {{ form.country_code.label(class='form-label') }}
+        {{ form.country_code(class='form-control') }}
+        {{ form.zipcode.label(class='form-label') }}
+        {{ form.zipcode(class='form-control') }}
+        {{ form.birthday.label(class='form-label') }}
+        {{ form.birthday(class='form-control') }}
+        {{ form.national_id.label(class='form-label') }}
+        {{ form.national_id(class='form-control') }}
+        <br>
+        {{ form.submit(class='btn btn-secondary') }}
+    </div>
+</form>
+{% endblock %}
