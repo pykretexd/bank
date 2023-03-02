@@ -3,7 +3,7 @@
 <form method='POST' class='border p-3 my-3 bg-body rounded'>
     <div>
         {{ form.hidden_tag() }}
-        
+
         {{ form.first_name.label(class='form-label') }}
         {{ form.first_name(class='form-control', value=customer_to_update.first_name) }}
 
@@ -34,7 +34,7 @@
         {{ form.zipcode.label(class='form-label') }}
         {{ form.zipcode(class='form-control', value=customer_to_update.zipcode) }}
         
-        {{ form.birthday.label(class='form-label) }}
+        {{ form.birthday.label(class='form-label') }}
         {{ form.birthday(class='form-control', value=customer_to_update.birthday) }}
         
         {{ form.national_id.label(class='form-label') }}
