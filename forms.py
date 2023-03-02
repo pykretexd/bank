@@ -51,7 +51,7 @@ class SignupUserForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message='Passwords must match')])
 
-class UpdateUserForm(FlaskForm):
+class UpdateCustomerForm(FlaskForm):
     first_name = StringField('First Name')
     last_name = StringField('Last Name')
     email_address = StringField('Email Address', validators=[Email()])
@@ -64,4 +64,9 @@ class UpdateUserForm(FlaskForm):
     zipcode = IntegerField('ZIP code')
     birthday = DateField('Date of Birth')
     national_id = StringField('National ID (XXXXXXXX-XXXX)', validators=[NationalId])
+    submit = SubmitField('Submit')
+
+class UpdateUserForm(FlaskForm):
+    email_address = StringField('Email Address')
+    role = SelectField('Role', choices=[])
     submit = SubmitField('Submit')
