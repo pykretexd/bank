@@ -1,8 +1,11 @@
 # Bank
 
-Se till att skapa en .env fil i `src` med samma fält som i `.env.example`.
+https://sixtenl-bank.azurewebsites.net/
 
-Starta appen i Windows Powershell:
+# Run locally
+Make sure to create an .env file in `src` with the same fields as in `.env.example`.
+
+Run the app in Windows Powershell:
 ```
 bank> python -m venv env
 bank> .\env\scripts\activate
