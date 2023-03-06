@@ -1,5 +1,4 @@
 import os
-from dotenv import load_dotenv
 from flask import Flask, render_template, redirect, url_for, request, flash, get_flashed_messages
 from flask_migrate import Migrate
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
@@ -9,9 +8,8 @@ from utils import check_valid_withdraw, seed_data
 from forms import CreateCustomerForm, WithdrawForm, DepositForm, TransferForm, LoginUserForm, SignupUserForm, UpdateCustomerForm, UpdateUserForm
 import datetime
 
-load_dotenv()
-database_uri = os.environ.get('DATABASE_URI')
-secret_key = os.environ.get('SECRET_KEY')
+database_uri = os.environ['DATABASE_URI']
+secret_key = os.environ['SECRET_KEY']
 
 app = Flask(__name__)
 migrate = Migrate(app, db)
