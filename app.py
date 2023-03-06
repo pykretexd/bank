@@ -8,12 +8,9 @@ from utils import check_valid_withdraw, seed_data
 from forms import CreateCustomerForm, WithdrawForm, DepositForm, TransferForm, LoginUserForm, SignupUserForm, UpdateCustomerForm, UpdateUserForm
 import datetime
 
-database_connection_string = f'mysql+pymysql://{os.environ["MYSQL_USER"]}:{os.environ["MYSQL_PASSWORD"]}@{os.environ["MYSQL_HOST"]}/{os.environ["MYSQL_NAME"]}' 
-
 app = Flask(__name__)
 migrate = Migrate(app, db)
-app.config['SQLALCHEMY_DATABASE_URI'] = database_connection_string
-app.config['SECRET_KEY'] = str(os.environ["MYSQL_PASSWORD"])
+app.config.from_object('config.ConfigDebug')
 db.init_app(app)
 
 login_manager = LoginManager()
