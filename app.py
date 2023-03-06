@@ -31,6 +31,11 @@ def load_user(user_id):
 def index():
     return render_template('index.html')
 
+@app.route('/country/<country>')
+def country(country):
+    customers = Customer.query.filter_by(country=country).order_by(Customer.total_balance.desc()).limit(10).all()
+    return render_template('country.html', country=country, customers=customers)
+
 @app.route('/customer/create', methods=['GET', 'POST'])
 def create_customer():
     form = CreateCustomerForm()
@@ -147,7 +152,6 @@ def transfer(customer_id):
         db.session.commit()
         flash('Transfer was successful.')
         return redirect(url_for('customer', customer_id=customer_id))
-
     return render_template('transfer.html', form=form)
 
 @app.route('/customer/<int:customer_id>/account/<int:account_id>', methods=['GET'])
@@ -420,7 +424,6 @@ def account_data(account_id):
         'recordsTotal': Transaction.query.filter_by(account_id=account_id).count(),
         'draw': request.args.get('draw', type=int),
     }
-
 
 if __name__ == '__main__':
     with app.app_context():

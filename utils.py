@@ -12,7 +12,7 @@ def check_valid_withdraw(balance, amount):
 def seed_data(db):
     seed_roles(db)
     seed_users(db)
-    seed_customers(5000, db)
+    seed_customers(50, db)
 
 def seed_roles(db):
     if Role.query.filter_by(name='Cashier').first() is None:

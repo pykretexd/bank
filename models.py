@@ -1,4 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func, select
+from sqlalchemy.ext.hybrid import hybrid_property
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -19,13 +21,21 @@ class Customer(db.Model):
     telephone_country_code = db.Column(db.Integer, unique=False, nullable=False)
     telephone = db.Column(db.String(20), unique=False, nullable=False)
     email_address = db.Column(db.String(50), unique=False, nullable=False)
-    accounts = db.relationship('Account', backref='Customer',lazy=True)
+    accounts = db.relationship('Account', backref='Customer',lazy='dynamic')
+
+    @hybrid_property
+    def total_balance(self):
+        return sum(account.balance for account in self.accounts)
+
+    @total_balance.expression
+    def total_balance(cls):
+        return (
+            select(func.sum(Account.balance))
+            .where(Account.customer_id == cls.id)
+            .label('total_balance')
+        )
 
     def to_dict(self):
-        accounts = self.accounts
-        balance = 0
-        for account in accounts:
-            balance += account.balance
         return {
             'id': self.id,
             'first_name': self.first_name,
@@ -40,7 +50,7 @@ class Customer(db.Model):
             'telephone_country_code': self.telephone_country_code,
             'telephone': self.telephone,
             'email_address': self.email_address,
-            'balance': balance
+            'balance': self.total_balance
         }
 
 class Account(db.Model):

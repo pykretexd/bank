@@ -37,7 +37,12 @@
                     {data: 'street_address'},
                     {data: 'city'},
                     {data: 'zipcode'},
-                    {data: 'country'},
+                    {
+                        data: 'country',
+                        render: function ( data, type, row, meta ) {
+                            return '<a href="/country/'+row.country+'">'+row.country+'</a>'
+                        }
+                    },
                     {data: 'birthday'},
                     {data: 'national_id', orderable: false},
                     {data: 'telephone', orderable: false},
