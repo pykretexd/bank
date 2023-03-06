@@ -3,7 +3,7 @@
 https://sixtenl-bank.azurewebsites.net/
 
 # Run locally
-Make sure to create an .env file in `src` with the same fields as in `.env.example`.
+Make sure to create an .env file in `src` with the same fields as in `.env.example` or just pass the variables straight into `config.py`.
 
 Run the app in Windows Powershell:
 ```
