@@ -1,6 +1,6 @@
 import os
 from flask import Flask, render_template, redirect, url_for, request, flash, get_flashed_messages
-from flask_migrate import Migrate
+from flask_migrate import Migrate, upgrade
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, Account, Customer, Transaction, User, Role
@@ -422,5 +422,6 @@ def account_data(account_id):
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+        upgrade()
         seed_data(db)
         app.run()
