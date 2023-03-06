@@ -23,6 +23,9 @@ jobs:
           python-version: '3.11'
 
       - name: Create and start virtual environment
+        env:
+            DATABASE_URI: ${{ secrets.DATABASE_URI }}
+            SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
           python -m venv venv
           source venv/bin/activate
